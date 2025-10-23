@@ -73,7 +73,7 @@ function Game() {
         let updateStatus = board.updateCell(getActivePlayer());
         if (!updateStatus) {
             console.log("Selected cell is already populated. Choose another one!");
-            return;
+            return updateStatus;
         };
         switch (winCheck(getActivePlayer())) {
             case 0:
@@ -92,6 +92,7 @@ function Game() {
         }
         switchPlayer();
         printRound();
+        return updateStatus;
     };
 
 // Check winner
@@ -162,7 +163,17 @@ function displayController() {
         if (!rowChoice || !colChoice)
             return;
 
-        game.play(rowChoice, colChoice);
+        const roundPlayed = game.play(rowChoice, colChoice);
+        
+        if (!roundPlayed && boardDiv.nextElementSibling === null) {
+            const spotTakenDiv = document.createElement("h2");
+            spotTakenDiv.textContent = "Selected cell is already populated. Choose another one!";
+            boardDiv.after(spotTakenDiv);
+        }
+        else if (roundPlayed && boardDiv.nextElementSibling) {
+            boardDiv.parentNode.removeChild(boardDiv.parentNode.lastElementChild);
+        }
+
         renderDisplay();
     }
     boardDiv.addEventListener("click", clickCell);
