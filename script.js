@@ -51,6 +51,8 @@ function Game() {
     let activePlayer = playerOne;
 
 // Play turn
+    const getActivePlayer = () => activePlayer;
+
     const switchPlayer = () => {
         if (activePlayer === playerOne)
             activePlayer = playerTwo;
@@ -60,24 +62,24 @@ function Game() {
 
     const printRound = () => {
         board.printBoard();
-        console.log(`Player ${activePlayer.name}'s with the ${activePlayer.marker} marker turn.`);
+        console.log(`Player ${getActivePlayer().name}'s with the ${getActivePlayer().marker} marker turn.`);
     };
 
     const play = (row, column) => {
         if (0 < row < 3 && 0 < column < 3)
-            activePlayer.selectCell(row, column);
+            getActivePlayer().selectCell(row, column);
         else
             console.log("Invalid selection!");
-        let updateStatus = board.updateCell(activePlayer);
+        let updateStatus = board.updateCell(getActivePlayer());
         if (!updateStatus) {
             console.log("Selected cell is already populated. Choose another one!");
             return;
         };
-        switch (winCheck(activePlayer)) {
+        switch (winCheck(getActivePlayer())) {
             case 0:
                 break;
             case 1:
-                console.log(`Player ${activePlayer.name} won!`);
+                console.log(`Player ${getActivePlayer().name} won!`);
                 board.resetBoard();
                 break;
             case 2:
@@ -123,7 +125,7 @@ function Game() {
 
     printRound();
 
-    return {play};
+    return {play, getActivePlayer, getBoard: board.getBoard};
 }
 
 function displayController() {
