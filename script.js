@@ -155,6 +155,18 @@ function displayController() {
         })
     };
 
+    function clickCell(e) {
+        const rowChoice = e.target.dataset.row;
+        const colChoice = e.target.dataset.column;
+        
+        if (!rowChoice || !colChoice)
+            return;
+
+        game.play(rowChoice, colChoice);
+        renderDisplay();
+    }
+    boardDiv.addEventListener("click", clickCell);
+
     renderDisplay();
 }
 
