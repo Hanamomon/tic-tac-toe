@@ -126,4 +126,34 @@ function Game() {
     return {play};
 }
 
-const ttt = Game();
+function displayController() {
+    const game = Game();
+    turnDiv = document.querySelector(".turn");
+    boardDiv = document.querySelector(".board");
+
+    const renderDisplay = () => {
+        boardDiv.textContent = "";
+
+        const board = game.getBoard();
+        const activePlayer = game.getActivePlayer();
+
+        turnDiv.textContent = `Player ${activePlayer.name}'s with the ${activePlayer.marker} marker turn.`;
+        
+        board.forEach((row, rowIndex) => {
+            row.forEach((cell, colIndex) => {
+                const cellButton = document.createElement("button");
+
+                cellButton.classList.add("cell");
+                cellButton.setAttribute("data-row", rowIndex);
+                cellButton.setAttribute("data-column", colIndex);
+
+                cellButton.textContent = cell;
+                boardDiv.appendChild(cellButton);
+            })
+        })
+    };
+
+    renderDisplay();
+}
+
+displayController();
