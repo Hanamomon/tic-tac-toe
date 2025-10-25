@@ -7,6 +7,27 @@
     <link href="style.css" rel="stylesheet">
 </head> 
 <body>
+    <div class="container">
+        <h1 class="turn"></h1>
+        <dialog id="nameDialog" closedby="none">
+            <div class="dialogContent">
+                <form>
+                    <label for="playerOne">
+                        Player One:
+                        <input id="playerOne" type="text" />
+                    </label>
+                    <label for="playerTwo">
+                        Player Two:
+                        <input id="playerTwo" type="text" />
+                    </label>
+                    <button value="cancel" formmethod="dialog">Close</button>
+                    <button id="confirm" value="default">Confirm</button>
+                </form>
+            </div>
+        </dialog>
+        <button id="showDialog">Change Names</button>
+        <div class="board"></div>
+    </div>
     <script src="script.js"></script>
 </body>
 </html>

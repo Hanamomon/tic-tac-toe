@@ -38,7 +38,7 @@ function Player(name, marker) {
     let selection = {};
     const selectCell = (row, column) => {
         selection = {row, column};
-    }
+    };
     const getCell = () => selection;
     return {name, marker, getCell, selectCell};
 }
@@ -127,7 +127,7 @@ function Game() {
 
     printRound();
 
-    return {play, getActivePlayer, getBoard: board.getBoard};
+    return {play, getActivePlayer, getBoard: board.getBoard, playerOne, playerTwo};
 }
 
 function displayController() {
@@ -207,6 +207,31 @@ function displayController() {
     boardDiv.addEventListener("click", clickCell);
 
     renderDisplay();
+
+    const showButton = document.querySelector("#showDialog");
+    const dialog = document.querySelector("#nameDialog");
+    const confirmBtn = document.querySelector("#confirm");
+
+    showButton.addEventListener("click", () => {
+        dialog.showModal();
+    });
+
+    dialog.addEventListener("close", () => {
+        if (dialog.returnValue !== "default" && dialog.returnValue !== "cancel") {
+            const names = dialog.returnValue.split("|");
+            game.playerOne.name = names[0];
+            game.playerTwo.name = names[1];
+        }
+    });
+
+    confirmBtn.addEventListener("click", (e) => {
+        e.preventDefault();
+        const pOneName = document.querySelector("#playerOne");
+        const pTwoName = document.querySelector("#playerTwo");
+        dialog.close(`${pOneName.value}|${pTwoName.value}`);
+        pOneName.value = "";
+        pTwoName.value = "";
+    });
 }
 
 displayController();
