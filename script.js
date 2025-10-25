@@ -75,7 +75,8 @@ function Game() {
             console.log("Selected cell is already populated. Choose another one!");
             return updateStatus;
         };
-        switch (winCheck(getActivePlayer())) {
+        const gameWon = winCheck(getActivePlayer());
+        switch (gameWon) {
             case 0:
                 break;
             case 1:
@@ -92,7 +93,7 @@ function Game() {
         }
         switchPlayer();
         printRound();
-        return updateStatus;
+        return {updateStatus, gameWon};
     };
 
 // Check winner
@@ -131,8 +132,8 @@ function Game() {
 
 function displayController() {
     const game = Game();
-    turnDiv = document.querySelector(".turn");
-    boardDiv = document.querySelector(".board");
+    const turnDiv = document.querySelector(".turn");
+    const boardDiv = document.querySelector(".board");
 
     const renderDisplay = () => {
         boardDiv.textContent = "";
@@ -163,17 +164,44 @@ function displayController() {
         if (!rowChoice || !colChoice)
             return;
 
-        const roundPlayed = game.play(rowChoice, colChoice);
-        
-        if (!roundPlayed && boardDiv.nextElementSibling === null) {
+        const activePlayer = game.getActivePlayer();
+        const {updateStatus: roundPlayed, gameWon} = game.play(rowChoice, colChoice);
+        const spotTakenMessage = document.querySelector(".taken");
+        const gameEndMessage = document.querySelector(".end");
+
+        if (!roundPlayed && spotTakenMessage === null) {
             const spotTakenDiv = document.createElement("h2");
+            spotTakenDiv.classList.add("taken");
             spotTakenDiv.textContent = "Selected cell is already populated. Choose another one!";
             boardDiv.after(spotTakenDiv);
         }
-        else if (roundPlayed && boardDiv.nextElementSibling) {
-            boardDiv.parentNode.removeChild(boardDiv.parentNode.lastElementChild);
+        else if (roundPlayed && spotTakenMessage) {
+            boardDiv.parentNode.removeChild(spotTakenMessage);
         }
 
+        switch (gameWon) {
+            case 0:
+                break;
+            case 1: {
+                const winMessageDiv = document.createElement("h2");
+                winMessageDiv.classList.add("end");
+                winMessageDiv.textContent = `Player ${activePlayer.name} won!`;
+                boardDiv.after(winMessageDiv);
+                break;
+            }
+            case 2: {
+                const tieMessageDiv = document.createElement("h2");
+                tieMessageDiv.classList.add("end");
+                tieMessageDiv.textContent = "It's a tie!";
+                boardDiv.after(tieMessageDiv);
+                break;
+            }
+            default:
+                console.log("default");
+        }
+        console.log(gameEndMessage);
+        if (gameWon !== 1 && gameWon !== 2 && gameEndMessage)
+            boardDiv.parentNode.removeChild(gameEndMessage);
         renderDisplay();
     }
     boardDiv.addEventListener("click", clickCell);
