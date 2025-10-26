@@ -46,8 +46,8 @@ function Player(name, marker) {
 // Game flow controller
 function Game() {
     const board = Gameboard();
-    const playerOne = Player("C moi", "X");
-    const playerTwo = Player("C toi", "O");
+    const playerOne = Player("One", "X");
+    const playerTwo = Player("Two", "O");
     let activePlayer = playerOne;
 
 // Play turn
@@ -62,35 +62,16 @@ function Game() {
 
     const printRound = () => {
         board.printBoard();
-        console.log(`Player ${getActivePlayer().name}'s with the ${getActivePlayer().marker} marker turn.`);
     };
 
     const play = (row, column) => {
-        if (0 < row < 3 && 0 < column < 3)
-            getActivePlayer().selectCell(row, column);
-        else
-            console.log("Invalid selection!");
+        getActivePlayer().selectCell(row, column);
         let updateStatus = board.updateCell(getActivePlayer());
         if (!updateStatus) {
             console.log("Selected cell is already populated. Choose another one!");
             return updateStatus;
         };
         const gameWon = winCheck(getActivePlayer());
-        switch (gameWon) {
-            case 0:
-                break;
-            case 1:
-                console.log(`Player ${getActivePlayer().name} won!`);
-                board.resetBoard();
-                break;
-            case 2:
-                board.printBoard();
-                console.log("It's a tie!");
-                board.resetBoard();
-                break;
-            default:
-                console.log("default");
-        }
         switchPlayer();
         printRound();
         return {updateStatus, gameWon};
@@ -127,13 +108,14 @@ function Game() {
 
     printRound();
 
-    return {play, getActivePlayer, getBoard: board.getBoard, playerOne, playerTwo};
+    return {play, getActivePlayer, getBoard: board.getBoard, resetBoard: board.resetBoard, playerOne, playerTwo};
 }
 
 function displayController() {
     const game = Game();
     const turnDiv = document.querySelector(".turn");
     const boardDiv = document.querySelector(".board");
+    const startButton = document.querySelector("#startGame");
 
     const renderDisplay = () => {
         boardDiv.textContent = "";
@@ -165,11 +147,16 @@ function displayController() {
             return;
 
         const activePlayer = game.getActivePlayer();
-        const {updateStatus: roundPlayed, gameWon} = game.play(rowChoice, colChoice);
+        let roundPlayed = false;
+        let gameWon = 0;
         const spotTakenMessage = document.querySelector(".taken");
         const gameEndMessage = document.querySelector(".end");
 
-        if (!roundPlayed && spotTakenMessage === null) {
+        if (gameEndMessage === null) {
+            ({updateStatus: roundPlayed, gameWon} = game.play(rowChoice, colChoice));
+        }
+
+        if (!roundPlayed && spotTakenMessage === null && gameEndMessage === null) {
             const spotTakenDiv = document.createElement("h2");
             spotTakenDiv.classList.add("taken");
             spotTakenDiv.textContent = "Selected cell is already populated. Choose another one!";
@@ -199,14 +186,23 @@ function displayController() {
             default:
                 console.log("default");
         }
-        console.log(gameEndMessage);
-        if (gameWon !== 1 && gameWon !== 2 && gameEndMessage)
-            boardDiv.parentNode.removeChild(gameEndMessage);
         renderDisplay();
     }
     boardDiv.addEventListener("click", clickCell);
 
     renderDisplay();
+
+    startButton.addEventListener("click", () => {
+        const spotTakenMessage = document.querySelector(".taken");
+        const gameEndMessage = document.querySelector(".end");
+        game.resetBoard();
+        renderDisplay();
+        if (spotTakenMessage)
+            boardDiv.parentNode.removeChild(spotTakenMessage);
+        else if (gameEndMessage) {
+            boardDiv.parentNode.removeChild(gameEndMessage);
+        }
+    });
 
     const showButton = document.querySelector("#showDialog");
     const dialog = document.querySelector("#nameDialog");
